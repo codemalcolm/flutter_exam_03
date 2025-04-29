@@ -19,6 +19,8 @@ class MyApp extends StatefulWidget {
 class _MyAppState extends State<MyApp> {
   var jsonData;
   var recipes;
+  var categories;
+  var categoriesData;
 
   @override
   void initState() {
@@ -30,12 +32,26 @@ class _MyAppState extends State<MyApp> {
     final String jsonString = await rootBundle.loadString(
       'assets/data/mobile-apps-portfolio-03-recipes.json',
     );
+
+    Set<Map<String, dynamic>> _recipesOfCategory(
+      Map<String, dynamic> data,
+      String category,
+    ) {
+      return data['recipes']
+          .where((recipe) => recipe['category'] == category)
+          .toSet();
+    }
+
     var data = await jsonDecode(jsonString);
+
     setState(() {
       jsonData = data;
       recipes = data["recipes"];
+      categories =
+          recipes.map<String>((recipe) => recipe['category'] as String).toSet().toList();
     });
-    print(recipes);
+
+    print(categories);
   }
 
   @override
@@ -48,21 +64,21 @@ class _MyAppState extends State<MyApp> {
         appBar: AppBar(title: const Text('Loaded Data from Json File')),
         body: Center(
           child:
-              recipes != Null
+              categories != null
                   ? ListView.builder(
-                    itemCount: recipes.length,
+                    itemCount: categories.length,
                     itemBuilder: (context, index) {
-                      final recipe = recipes[index];
+                      final category = categories[index];
                       return ListTile(
-                        title: Text(recipe['name']),
-                        subtitle: Text(
-                          'Recipe Category: ${recipe['category']}',
-                        ),
+                        title: Text(category),
                         trailing: GestureDetector(
                           behavior: HitTestBehavior.translucent,
                           onTap: () {
                             Navigator.of(context).push(
-                            MaterialPageRoute(builder: (context) => const CuisinePage()),);
+                              MaterialPageRoute(
+                                builder: (context) => const CuisinePage(),
+                              ),
+                            );
                           },
                           child: Container(
                             width: 48,
