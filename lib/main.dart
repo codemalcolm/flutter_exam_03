@@ -33,25 +33,27 @@ class _MyAppState extends State<MyApp> {
       'assets/data/mobile-apps-portfolio-03-recipes.json',
     );
 
-    Set<Map<String, dynamic>> _recipesOfCategory(
-      Map<String, dynamic> data,
-      String category,
-    ) {
-      return data['recipes']
-          .where((recipe) => recipe['category'] == category)
-          .toSet();
-    }
-
     var data = await jsonDecode(jsonString);
 
     setState(() {
       jsonData = data;
       recipes = data["recipes"];
       categories =
-          recipes.map<String>((recipe) => recipe['category'] as String).toSet().toList();
+          recipes
+              .map<String>((recipe) => recipe['category'] as String)
+              .toSet()
+              .toList();
     });
+  }
 
-    print(categories);
+  List<Map<String, dynamic>> _recipesOfCategory(
+    Map<String, dynamic> data,
+    String category,
+  ) {
+    return data['recipes']
+        .where((recipe) => recipe['category'] == category)
+        .map<Map<String, dynamic>>((recipe) => recipe as Map<String,dynamic>)
+        .toList();
   }
 
   @override
@@ -61,7 +63,7 @@ class _MyAppState extends State<MyApp> {
       debugShowCheckedModeBanner: false,
       theme: ThemeData(primarySwatch: Colors.green),
       home: Scaffold(
-        appBar: AppBar(title: const Text('Loaded Data from Json File')),
+        appBar: AppBar(title: const Text('Cuisine Categories')),
         body: Center(
           child:
               categories != null
@@ -76,7 +78,11 @@ class _MyAppState extends State<MyApp> {
                           onTap: () {
                             Navigator.of(context).push(
                               MaterialPageRoute(
-                                builder: (context) => const CuisinePage(),
+                                builder:
+                                    (context) => CuisinePage(
+                                      recipesFromCategory: _recipesOfCategory(jsonData, category),
+                                      categoryName: category
+                                    ),
                               ),
                             );
                           },
@@ -85,7 +91,7 @@ class _MyAppState extends State<MyApp> {
                             height: 48,
                             padding: const EdgeInsets.symmetric(vertical: 4.0),
                             alignment: Alignment.centerRight,
-                            child: const CircleAvatar(),
+                            child: Icon(Icons.arrow_forward),
                           ),
                         ),
                       );
@@ -97,3 +103,4 @@ class _MyAppState extends State<MyApp> {
     );
   }
 }
+
